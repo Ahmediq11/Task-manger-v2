@@ -5,11 +5,26 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
+    // Create or get feedback element
+    let feedbackDiv = document.getElementById('feedback');
+    if (!feedbackDiv) {
+        feedbackDiv = document.createElement('div');
+        feedbackDiv.id = 'feedback';
+        document.getElementById('registerForm').insertAdjacentElement('beforebegin', feedbackDiv);
+    }
+
+    // Disable form while submitting
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Registering...';
+
     try {
-        const response = await fetch('http://localhost:3000/register', {
+        // Replace with your deployed backend URL
+        const response = await fetch('https://task-manger-v2.onrender.com/register', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({ username, email, password })
         });
@@ -17,13 +32,27 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         const data = await response.json();
 
         if (response.ok) {
-            alert('Registration successful! Please login.');
-            window.location.href = 'login.html';
+            // Show success message
+            feedbackDiv.className = 'alert alert-success';
+            feedbackDiv.textContent = 'Registration successful! Redirecting to login...';
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
         } else {
-            alert(data.message || 'Registration failed');
+            // Show error from server
+            feedbackDiv.className = 'alert alert-danger';
+            feedbackDiv.textContent = data.message || 'Registration failed. Please try again.';
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Register';
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred during registration');
+        // Show network error
+        feedbackDiv.className = 'alert alert-danger';
+        feedbackDiv.textContent = 'Network error. Please check your connection and try again.';
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Register';
     }
 });

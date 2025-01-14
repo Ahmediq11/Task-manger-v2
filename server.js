@@ -4,6 +4,11 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+app.use(cors({
+  origin: ['https://ahmediq11.github.io', 'http://localhost:3000'],
+  credentials: true
+}));
+
 const app = express();
 app.use(cors());
 app.use(express.json());
